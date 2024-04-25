@@ -1,0 +1,103 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class OnlineVotingSystem {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Map<String, String> users = new HashMap<>();
+    private static Map<String, Candidate> candidates = new HashMap<>();
+    private static Map<String, Integer> votes = new HashMap<>();
+
+    public static void main(String[] args) {
+        // Initialize the system
+        initialize();
+
+        // User authentication
+        String username = authenticateUser();
+        if (username != null) {
+            System.out.println("Authentication successful. Welcome, " + username + "!");
+            // Allow user to cast vote
+            castVote(username);
+        } else {
+            System.out.println("Authentication failed. Exiting...");
+            return;
+        }
+
+        // Vote counting
+        countVotes();
+
+        // Display election results
+        displayResults();
+    }
+
+    private static void initialize() {
+        // Add some dummy users (in a real system, this would come from a database)
+        users.put("abhi", "admin");
+        users.put("admin", "admin@");
+
+        // Add some dummy candidates
+        candidates.put("candidate1", new Candidate("Candidate 1"));
+        candidates.put("candidate2", new Candidate("Candidate 2"));
+    }
+
+    private static String authenticateUser() {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+
+        if (users.containsKey(username) && users.get(username).equals(password)) {
+            return username;
+        } else {
+            return null;
+        }
+    }
+
+    private static void castVote(String username) {
+        System.out.println("Candidates:");
+        for (String key : candidates.keySet()) {
+            System.out.println(key + ": " + candidates.get(key).getName());
+        }
+
+        System.out.print("Enter the name of the candidate you want to vote for: ");
+        String candidateName = scanner.nextLine();
+
+        if (candidates.containsKey(candidateName)) {
+            votes.put(candidateName, votes.getOrDefault(candidateName, 0) + 1);
+            System.out.println("Vote cast successfully for " + candidateName + "!");
+        } else {
+            System.out.println("Invalid candidate name. Vote not cast.");
+        }
+    }
+
+    private static void countVotes() {
+        System.out.println("Vote Counting:");
+        for (String candidateName : votes.keySet()) {
+            System.out.println(candidateName + ": " + votes.get(candidateName) + " votes");
+        }
+    }
+
+    private static void displayResults() {
+        System.out.println("Election Results:");
+        int totalVotes = 0;
+        for (int count : votes.values()) {
+            totalVotes += count;
+        }
+        for (String candidateName : votes.keySet()) {
+            double percentage = (double) votes.get(candidateName) / totalVotes * 100;
+            System.out.println(candidateName + ": " + votes.get(candidateName) + " votes (" + percentage + "%)");
+        }
+    }
+
+    static class Candidate {
+        private String name;
+
+        public Candidate(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+    }
+}
